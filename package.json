@@ -1,0 +1,27 @@
+{
+  "name": "server-social-media",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmad-azzam/server-social-media.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ahmad-azzam/server-social-media/issues"
+  },
+  "homepage": "https://github.com/ahmad-azzam/server-social-media#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "helmet": "^4.6.0",
+    "mongoose": "^6.1.4",
+    "morgan": "^1.10.0"
+  }
+}
