@@ -14,13 +14,33 @@ function errorHandler(err, req, res, next) {
             code = 400
             message = 'Id Not Found !'
             break;
+        case 'CastError':
+            code = 400
+            message = 'Id Not Found !'
+            break;
         case 'JsonWebTokenError':
             code = 401
             message = 'Invalid Token !'
             break;
-        case 'CastError':
-            code = 400
-            message = 'Id Not Found !'
+        case 'Forbidden':
+            code = 403
+            message = 'You havent access to this user'
+            break;
+        case 'Cant Follow Yourself':
+            code = 403
+            message = 'Cannot follow yourself'
+            break;
+        case 'Already Follow':
+            code = 403
+            message = 'You have already follow this user'
+            break;
+        case 'Cant UnFollow Yourself':
+            code = 403
+            message = 'Cannot unfollow yourself'
+            break;
+        case 'Already UnFollow':
+            code = 403
+            message = 'You have already unfollow this user'
             break;
         default:
             break;

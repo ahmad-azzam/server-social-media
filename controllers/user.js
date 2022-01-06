@@ -1,46 +1,82 @@
-const { hashPassword, comparePassword } = require('../helpers/bcrypt');
-const { signToken } = require('../helpers/jwt');
-const { checkIdInDatabase } = require('../middlewares/checkId');
+const { decodeToken } = require('../helpers/jwt');
 const User = require('../models/User');
 
 class UserController {
-    static async register(req, res, next) {
+    static async updateUser(req, res, next) {
         try {
-            const { username, email, password } = req.body
-            const passwordHash = await hashPassword(password)
-            const user = new User({
-                username,
-                email,
-                password: passwordHash
+            const id = req.params.id
+            const { username, profilePicture, coverPicture, desc, city, from } = req.body
+            await User.findByIdAndUpdate(id, {
+                username, profilePicture, coverPicture, desc, city, from
             })
-            const result = await user.save()
-            res.status(200).json(result)
+            res.status(200).json({ message: 'Success to Update User' })
         } catch (err) {
             next(err)
         }
     }
-    static async login(req, res, next) {
+    static async deleteUser(req, res, next) {
         try {
-            const { email, password } = req.body
-            const user = await User.findOne({ email })
-            if (!user) throw { name: 'Authentication' }
-            const validPassword = await comparePassword(password, user.password)
-            if (!validPassword) throw { name: 'Authentication' }
-            if (user && validPassword) {
-                const token = await signToken({ email: user.email })
-                res.status(200).json({ token })
+            const id = req.params.id
+            await User.findByIdAndDelete(id)
+            res.status(200).json({ message: 'Success to Delete User' })
+        } catch (err) {
+            next(err)
+        }
+    }
+    static async getUser(req, res, next) {
+        try {
+            const id = req.params.id
+            const user = await User.findById(id)
+            const { password, updatedAt, createdAt, ...others } = user._doc
+            res.status(200).json({ user: others })
+        } catch (err) {
+            next(err)
+        }
+    }
+    static async followUser(req, res, next) {
+        try {
+            const { id: idUser } = req.params
+            const { token } = req.headers
+            const { email } = await decodeToken(token)
+            const result = await User.findOne({ email })
+            const idCurrentUser = result.id
+            if (idUser !== idCurrentUser) {
+                const user = await User.findById(idUser)
+                const currentUser = await User.findById(idCurrentUser)
+                if (!user.followers.includes(idCurrentUser)) {
+                    await user.updateOne({ $push: { followers: idCurrentUser } })
+                    await currentUser.updateOne({ $push: { following: idUser } })
+                    res.status(200).json({ message: 'Success to following' })
+                } else {
+                    throw { name: 'Already Follow' }
+                }
+            } else {
+                throw { name: 'Cant Follow Yourself' }
             }
         } catch (err) {
             next(err)
         }
     }
-    static async updateUser(req, res, next) {
+    static async unfollowUser(req, res, next) {
         try {
-            const id = req.params.id
-            const user = await User.findByIdAndUpdate(id, {
-                $set: req.body
-            })
-            res.status(200).json({ message: 'Success to Update User' })
+            const { id: idUser } = req.params
+            const { token } = req.headers
+            const { email } = await decodeToken(token)
+            const result = await User.findOne({ email })
+            const idCurrentUser = result.id
+            if (idUser !== idCurrentUser) {
+                const user = await User.findById(idUser)
+                const currentUser = await User.findById(idCurrentUser)
+                if (user.followers.includes(idCurrentUser)) {
+                    await user.updateOne({ $pull: { followers: idCurrentUser } })
+                    await currentUser.updateOne({ $pull: { following: idUser } })
+                    res.status(200).json({ message: 'Success to unfollow' })
+                } else {
+                    throw { name: 'Already UnFollow' }
+                }
+            } else {
+                throw { name: 'Cant UnFollow Yourself' }
+            }
         } catch (err) {
             next(err)
         }
