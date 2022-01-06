@@ -7,7 +7,8 @@ const { authentication } = require("../middlewares/auth");
 router.use('/', authRoute)
 
 router.use(authentication)
-router.use('/', userRoute)
+router.use('/user', userRoute)
+router.use('/post', postRoute)
 
 module.exports = router
 
