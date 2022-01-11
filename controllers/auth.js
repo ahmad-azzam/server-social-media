@@ -13,7 +13,7 @@ class AuthController {
                 password: passwordHash
             })
             const result = await user.save()
-            res.status(200).json(result)
+            res.status(200).json({ data: result })
         } catch (err) {
             next(err)
         }

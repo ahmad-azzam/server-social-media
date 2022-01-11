@@ -42,6 +42,10 @@ function errorHandler(err, req, res, next) {
             code = 403
             message = 'You have already unfollow this user'
             break;
+        case 'Forbidden Post':
+            code = 403
+            message = 'Forbidden to update this post'
+            break;
         default:
             break;
     }

@@ -28,7 +28,7 @@ class UserController {
             const id = req.params.id
             const user = await User.findById(id)
             const { password, updatedAt, createdAt, ...others } = user._doc
-            res.status(200).json({ user: others })
+            res.status(200).json({ data: others })
         } catch (err) {
             next(err)
         }
